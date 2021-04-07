@@ -22,22 +22,25 @@ cur.executemany("insert into PhoneBook values (?,?);", datalist)
 
 #검색
 cur.execute(("select * from PhoneBook;"))
-# for row in cur:
-#         print(row)
+for row in cur:
+        print(row)
 
-print(cur.fetchone())
+for item in con.iterdump():
+    print(item)
 
-print("----fetchmany(2)----")
-print(cur.fetchmany(2))
-print("-----fetchall()-----")
-print(cur.fetchall())
+#백업받기(덤프)
+f = open("c:\\work2\\dump.sql", "wt")
+for item in con.iterdump():
+    print(item)
+    f.write(item+"\n")
 
-cur.execute("select *from PhoneBook;")
-result = cur.fetchone()
-print(result[0])
-print(result[1])
-#2차원 행열 데이터 [행][열]
-print("----다중행----")
-result = cur.fetchall()
-print(result[0][0])
-print(result[0][1])
+f.close()
+
+#복구하기(with 블럭안에서 피일을 닫고 빠져나온다.)
+with open("c:\\work2\\dump.sql") as f:
+    SQLScript = f.read()
+#구문을 실행하기 위해
+con = sqlite3.connect("c:\\work2\\Demo.db")
+cur = con.cursor()
+#다중라인으로 된 SQL배치파일
+cur.executescript(SQLScript)
